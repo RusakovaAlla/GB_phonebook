@@ -1,35 +1,49 @@
-#ввод с хранение данных принимаем структурой в два списка
-#first_name, last_name, gender, birthday, comment - список1
+# ввод с хранение данных принимаем структурой в два списка
+# first_name, last_name, gender, birthday, comment - список1
 # type_phn, phn, userid - список2, последнее значение получаем по добавлении
+import creatingDB
 import sqlite3
+import modul_vvod
+
 
 def input_new_user():
-    structure = ['имя', 'фамилия', 'пол', 'дата_рождения', 'комментарий']
-    to_insert_new = [[], []]
-    to_insert_new[0].append(input('Введите имя: '))
-    to_insert_new[0].append(input('Введите фамилию: '))
-    to_insert_new[1].append(input('Введите номер телефона'))
-    to_insert_new[1].insert(0, input('Тип номера: '))
-    to_insert_new[0].append(input('Укажите пол: '))
-    to_insert_new[0].append(input('Укажите дату рождения: '))
-    to_insert_new[0].append(input('Комментарий: '))
+    return modul_vvod.get_info()
 
-    return to_insert_new
 
-new_user = input_new_user()
-print(new_user)
+def add_contact_manual_user(data_base='phonebook.db'):
+    conn = sqlite3.connect(data_base)
+    data = input_new_user()
+    with conn:
+        cur = conn.cursor()
+        query = """INSERT INTO users(first_name,last_name,gender,birthday,comment) VALUES (?,?,?,?,?)"""
+        cur.execute(query, data[0])
+        data[1].append(cur.lastrowid)
+        conn.commit()
+    add_contact_manual_phone(data, conn)
 
-db = 'phonebook.db'
-conn = sqlite3.connect(db)
-with conn:
-    cur = conn.cursor()
-    query = """INSERT INTO users(first_name,last_name,gender,birthday,comment) VALUES (?,?,?,?,?)"""
-    cur.execute(query, new_user[0])
-    new_user[1].append(cur.lastrowid)
-    conn.commit()
-print(new_user)
-with conn:
-    cur = conn.cursor()
-    query = """INSERT INTO phonenumbers(type_phn, phn, userid) VALUES (?,?,?)"""
-    cur.execute(query, new_user[1])
-    conn.commit()
+
+def add_contact_manual_phone(data, conn=None):
+    with conn:
+        cur = conn.cursor()
+        query = """INSERT INTO phonenumbers(type_phn, phn, userid) VALUES (?,?,?)"""
+        cur.execute(query, data[1])
+        conn.commit()
+
+
+def add_contact_import_user(from_file, data_base='phonebook.db'):
+    conn = sqlite3.connect(data_base)
+    with conn:
+        cur = conn.cursor()
+        query = """INSERT INTO users(first_name,last_name,gender,birthday,comment) VALUES (?,?,?,?,?)"""
+        cur.execute(query, from_file[0])
+        from_file[1].append(cur.lastrowid)
+        conn.commit()
+    add_contact_import_phone(from_file[1], conn)
+
+
+def add_contact_import_phone(data, conn=None):
+    with conn:
+        cur = conn.cursor()
+        query = """INSERT INTO phonenumbers(type_phn, phn, userid) VALUES (?,?,?)"""
+        cur.execute(query, data)
+        conn.commit()

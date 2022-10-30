@@ -1,11 +1,11 @@
-def get_info ():
-    info = []
+def get_info():
+    info = [[], []]
     last_name = input('Введите фамилию: ')
-    info.append(last_name)
-    first_name = input('Введите имя: ')
-    info.append(first_name)
-    phone_number = ''
-    valid =False
+    while len(last_name) < 1:
+        last_name = input('Это обязательное поле, пустым нельзя оставить. Введите фамилию: ')
+    info[0].append(last_name)
+    info[0].append(input('Введите имя: '))
+    valid = False
     while not valid:
         try:
             phone_number = input('Введите номер телефона: ')
@@ -16,9 +16,13 @@ def get_info ():
                 valid = True
         except:
             print('Номер телефона должен состоять только из цифр.')
-    info.append(phone_number)
-    description = input('Введите описание: ')
-    info.append(description)
-    return
+    info[1].append(phone_number)
+    info[1].insert(0, input('Тип номера: '))
+    info[0].append(input('Укажите пол: '))
+    info[0].append(input('Укажите дату рождения: '))
+    info[0].append(input('Введите описание: '))
+
+    return info
 
 
+#print(get_info())
